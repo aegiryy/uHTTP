@@ -8,10 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "control.h"
+#include "server.h"
 
 #define SOCKET_ERROR        -1
-#define BUFFER_SIZE         1024 
 #define QUEUE_SIZE          5
 
 int main(int argc, char* argv[])
@@ -68,16 +67,16 @@ int main(int argc, char* argv[])
 
         if(fork() == 0)
         {
-            char * data;
-            read(hSocket,pBuffer,BUFFER_SIZE);
+            char * resp;
+            pBuffer[read(hSocket,pBuffer,BUFFER_SIZE)] = '\0';
             printf("%s", pBuffer);
             /*
             strcpy(pBuffer, "HTTP/1.1 200 OK\nDate: Thu, 10 Mar 2011 15:31:59 GMT\nContent-Type: text/html;charset=ISO-8859-1\nContent-Length: 13\n\nHello, world!");
             write(hSocket, pBuffer, strlen(pBuffer));
             */
-            data = respond(pBuffer);
-            write(hSocket, data, strlen(data));
-            free(data);
+            resp = respond(pBuffer);
+            write(hSocket, resp, strlen(resp));
+            free(resp);
             close(hSocket);
             exit(0);
         }
