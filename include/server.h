@@ -3,7 +3,6 @@
 #define BUFFER_SIZE         1024 
 
 /* return value should be freed by caller */
-extern char req[BUFFER_SIZE];
 
 char * respond(char * rawreq);
 

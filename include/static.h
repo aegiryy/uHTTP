@@ -1,6 +1,6 @@
 #ifndef _STATIC_H
 #define _STATIC_H
 
-char * staticserve(char * path);
+char * static_serve(char * path, unsigned int * size);
 
 #endif
