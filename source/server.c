@@ -66,10 +66,12 @@ int main(int argc, char* argv[])
     for(;;)
     {
         char url[1024];
+        char path[1024];
         char ext[8];
         char params[1024];
         int sz_read;
         /* get the connected socket */
+        path[0] = '\0';
         hSocket=accept(hServerSocket,(struct sockaddr*)&Address,(socklen_t *)&nAddressSize);
         pBuffer[sz_read = read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
         // write(1, pBuffer, sz_read);
@@ -93,7 +95,11 @@ int main(int argc, char* argv[])
                 if (resolve(pBuffer, url, ext, params) == 0)
                     static_serve(ROOT_DIR);
                 else
-                    do_cgi(url, ext, params);
+                {
+                    strcat(path, ROOT_DIR);
+                    strcat(path, url);
+                    do_cgi(path, ext, params);
+                }
                 /* close pipe ends */
                 close(p2c[0]);
                 close(c2p[1]);
