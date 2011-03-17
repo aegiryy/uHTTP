@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #define BUF_SIZE 1024
-#define PROG_NUM 3  //cgi解释器的表大小
+#define PROG_NUM 3  
 char* prog_suff[PROG_NUM]={"php","py","sh"};
 char* prog_name[PROG_NUM]={"php-cgi","python","bash"};
 
@@ -28,7 +28,7 @@ void do_cgi(const char* path,const char* suffix,const char* params){
 	strcat(cmd, path);
 	strcat(cmd, " ");
 	strcat(cmd, params);
-	printf("%s\n\n",cmd);
+
 	if((fp=popen(cmd,"r"))!=NULL){
         	while(fgets(data,sizeof(data),fp)!=NULL){
 			printf("%s",data);
