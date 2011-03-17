@@ -8,10 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "static.h"
+#include "resolver.h"
 
 #define BUFFER_SIZE 1024
 #define SOCKET_ERROR -1
 #define QUEUE_SIZE 5
+#define ROOT_DIR "."
 
 int main(int argc, char* argv[])
 {
@@ -62,34 +64,43 @@ int main(int argc, char* argv[])
 
     for(;;)
     {
+        char url[1024];
+        char ext[8];
+        char params[1024];
+        int sz_read;
         /* get the connected socket */
         hSocket=accept(hServerSocket,(struct sockaddr*)&Address,(socklen_t *)&nAddressSize);
+        pBuffer[sz_read = read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
+        // write(1, pBuffer, sz_read);
+
         if(fork() == 0)
         {
-            int sz_read;
             int p2c[2];
             int c2p[2];
             pipe(p2c);
             pipe(c2p);
-            pBuffer[sz_read = read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
-            write(1, pBuffer, sz_read);
             if (fork() == 0)
             {
-                char * argv[] = {"uHTTPStatic", "."};
+                /* close unnecessary pipe ends */
                 close(p2c[1]);
                 close(c2p[0]);
-
+                /* turn stdios to pipes */
                 close(0);
                 dup(p2c[0]);
                 close(1);
                 dup(c2p[1]);
-                static_serve(2, argv);
+                if (resolve(pBuffer, url, ext, params) == 0)
+                    static_serve(ROOT_DIR);
+                else
+                    printf("Under construction!");
+                /* close pipe ends */
                 close(p2c[0]);
                 close(c2p[1]);
                 exit(0);
             }
             else
             {
+
                 close(p2c[0]);
                 close(c2p[1]);
 
@@ -101,7 +112,6 @@ int main(int argc, char* argv[])
             close(hSocket);
             exit(0);
         }
-
         close(hSocket);
     }
 }
