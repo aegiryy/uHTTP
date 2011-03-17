@@ -68,15 +68,22 @@ int main(int argc, char* argv[])
         if(fork() == 0)
         {
             char * resp;
-            pBuffer[read(hSocket,pBuffer,BUFFER_SIZE)] = '\0';
+            FILE * micro_httpd;
+            int sz_read;
+            pBuffer[read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
             printf("%s", pBuffer);
+            micro_httpd = popen("./micro_httpd .", "r+");
+            fwrite(pBuffer, sizeof(char), strlen(pBuffer), micro_httpd);
+            while (sz_read = fread(pBuffer, sizeof(char), BUFFER_SIZE, micro_httpd))
+            {
+                write(hSocket, pBuffer, sz_read);
+            }
+            fclose(micro_httpd);
             /*
-            strcpy(pBuffer, "HTTP/1.1 200 OK\nDate: Thu, 10 Mar 2011 15:31:59 GMT\nContent-Type: text/html;charset=ISO-8859-1\nContent-Length: 13\n\nHello, world!");
-            write(hSocket, pBuffer, strlen(pBuffer));
-            */
             resp = respond(pBuffer);
             write(hSocket, resp, strlen(resp));
             free(resp);
+            */
             close(hSocket);
             exit(0);
         }

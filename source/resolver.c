@@ -20,7 +20,7 @@ void rslv_get_method(char * rawreq, char * method)
     method[i] = '\0';
 }
 
-void rslv_get_postfix(char * rawreq, char * postfix)
+void rslv_get_ext(char * rawreq, char * ext)
 {
     int i, j;
     char url[256];
@@ -29,11 +29,11 @@ void rslv_get_postfix(char * rawreq, char * postfix)
     for (; url[i] != '.' && url[i] != '/'; i--);
     if (url[i] == '/')
     {
-        postfix[0] = '\0';
+        ext[0] = '\0';
         return;
     }
     i++;
     for (j = 0; url[i] != '\0'; i++, j++)
-        postfix[j] = url[i];
-    postfix[j] = '\0';
+        ext[j] = url[i];
+    ext[j] = '\0';
 }
