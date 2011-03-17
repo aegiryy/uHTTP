@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "static.h"
 #include "resolver.h"
-
+#include "cgi.h"
 #define BUFFER_SIZE 1024
 #define SOCKET_ERROR -1
 #define QUEUE_SIZE 5
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
                 if (resolve(pBuffer, url, ext, params) == 0)
                     static_serve(ROOT_DIR);
                 else
-                    printf("Under construction!");
+                    do_cgi(url,ext,params);
                 /* close pipe ends */
                 close(p2c[0]);
                 close(c2p[1]);
