@@ -1,63 +1,107 @@
-#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <signal.h>
 #include <string.h>
+#include <unistd.h>
 #include <stdio.h>
-#include "server.h"
+#include <stdlib.h>
 #include "static.h"
-#include "resolver.h"
 
-static char * mapping[] = {
-    "html", "text/html; charset=UTF-8",
-    "js", "text/javascript",
-    "png", "image/png", 
-    "jpg", "image/jpeg",
-    "css", "text/css",
-    "", "text/plain"
-};
+#define BUFFER_SIZE 1024
+#define SOCKET_ERROR -1
+#define QUEUE_SIZE 5
 
-static int sz_mapping = sizeof(mapping) / sizeof(mapping[0]) / 2;
-
-static int get_contenttype(char * ext);
-
-char * respond(char * rawreq)
+int main(int argc, char* argv[])
 {
-    char ext[8];
-    char * content;
-    char * resp;
-    unsigned int ctsize;
-    rslv_get_ext(rawreq, ext);
-    content = static_serve(rawreq, &ctsize);
-    if (content == NULL)
+    int hSocket,hServerSocket;  /* handle to socket */
+    struct sockaddr_in Address; /* Internet socket address stuct */
+    int nAddressSize = sizeof(struct sockaddr_in);
+    char pBuffer[BUFFER_SIZE];
+    int nHostPort;
+
+    if(argc < 2)
     {
-        char status[] = "HTTP/1.0 404 Not Found";
-        content = (char *)malloc(strlen(status) + 1);
-        strcpy(content, status);
-        return content;
+	    printf("\nUsage: server host-port\n");
+	    return 0;
     }
     else
     {
-        char status[] = "HTTP/1.0 200 OK\n";
-        char header[] = "Content-Type: ";
-        char * type;
-        char header_end[] = "\nLast-Modified: Thu, 05 Aug 2010 22:54:44 GMT\nDate: Wed, 16 Mar 2011 11:35:28 GMT\nConnection: close\n\n";
-        type = mapping[2 * get_contenttype(ext) + 1];
-        resp = (char *)malloc(strlen(status) + strlen(header) + strlen(type) + strlen(header_end) + ctsize);
-        resp[0] = '\0';
-        strcat(resp, status);
-        strcat(resp, header);
-        strcat(resp, type);
-        strcat(resp, header_end);
-        printf("%s\n", resp);
-        strcat(resp, content);
-        free(content);
-        return resp;
+	    nHostPort = atoi(argv[1]);
     }
-}
+    /* make a socket */
+    printf("Starting server at port %d...\n", nHostPort);
+    hServerSocket = socket(AF_INET,SOCK_STREAM,0);
+    if(hServerSocket == SOCKET_ERROR)
+    {
+        printf("\nCould not make a socket\n");
+        return 0;
+    }
+    /* fill address struct */
+    Address.sin_addr.s_addr = INADDR_ANY;
+    Address.sin_port = htons(nHostPort);
+    Address.sin_family = AF_INET;
 
-static int get_contenttype(char * ext)
-{
-    int i;
-    for (i = 0; i < sz_mapping; i++)
-        if (strcmp(mapping[i * 2], ext) == 0)
-            return i;
-    return -1;
+
+    /* bind to a port */
+    if(bind(hServerSocket, (struct sockaddr*)&Address, sizeof(Address)) == SOCKET_ERROR)
+    {
+        printf("\nCould not connect to host\n");
+        return 0;
+    }
+
+    /* establish listen queue */
+    if(listen(hServerSocket,QUEUE_SIZE) == SOCKET_ERROR)
+    {
+        printf("\nCould not listen\n");
+        return 0;
+    }
+
+    signal(SIGCHLD, SIG_IGN);
+
+    for(;;)
+    {
+        /* get the connected socket */
+        hSocket=accept(hServerSocket,(struct sockaddr*)&Address,(socklen_t *)&nAddressSize);
+        if(fork() == 0)
+        {
+            int sz_read;
+            int p2c[2];
+            int c2p[2];
+            pipe(p2c);
+            pipe(c2p);
+            pBuffer[sz_read = read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
+            write(1, pBuffer, sz_read);
+            if (fork() == 0)
+            {
+                char * argv[] = {"uHTTPStatic", "."};
+                close(p2c[1]);
+                close(c2p[0]);
+
+                close(0);
+                dup(p2c[0]);
+                close(1);
+                dup(c2p[1]);
+                static_serve(2, argv);
+                close(p2c[0]);
+                close(c2p[1]);
+                exit(0);
+            }
+            else
+            {
+                close(p2c[0]);
+                close(c2p[1]);
+
+                write(p2c[1], pBuffer, sz_read);
+                while ((sz_read = read(c2p[0], pBuffer, BUFFER_SIZE)) > 0)
+                    write(hSocket, pBuffer, sz_read);
+            }
+
+            close(hSocket);
+            exit(0);
+        }
+
+        close(hSocket);
+    }
 }
