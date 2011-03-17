@@ -23,8 +23,11 @@ int resolve(char * req, char * url, char * ext, char * params)
     }
     else
     {
+        char * andmark;
         *quesmark = '\0';
         strcpy(params, quesmark + 1);
+        while ((andmark = strrchr(params, '&')) != NULL)
+            *andmark = ' ';
         strcpy(ext, dot + 1);
     }
     return in_exts(ext);
