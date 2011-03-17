@@ -1,23 +1,25 @@
 CC=gcc
 SRC=source
 INC=include
-CFLAGS=-I$(INC) -Wall
+CFLAGS=-I$(INC) -Wall -c
+OBJS=server.o static.o resolver.o cgi.o
+TARGET=server
 
-all: server.o static.o resolver.o cgi.o
-	$(CC) server.o static.o resolver.o cgi.o -o server
+all: $(OBJS)
+	$(CC) $(OBJS) -o $(TARGET)
 
 server.o: $(SRC)/server.c
-	$(CC) $(CFLAGS) -c $(SRC)/server.c
+	$(CC) $(CFLAGS) $<
 
 static.o: $(SRC)/static.c
-	$(CC) $(CFLAGS) -c $(SRC)/static.c
+	$(CC) $(CFLAGS) $<
 
 resolver.o: $(SRC)/resolver.c
-	$(CC) $(CFLAGS) -c $(SRC)/resolver.c
+	$(CC) $(CFLAGS) $<
 
 cgi.o: $(SRC)/cgi.c
-	$(CC) $(CFLAGS) -c $(SRC)/cgi.c
+	$(CC) $(CFLAGS) $<
 
 clean:
-	rm *.o
-	rm server
+	rm -f *.o
+	rm -f $(TARGET)

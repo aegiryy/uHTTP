@@ -71,7 +71,7 @@ int static_serve(char * rootdir)
 	        goto do_file;
 	    }
 	    send_headers(200, "Ok", (char*) 0, "text/html", -1, sb.st_mtime);
-	    printf("<html><head><title>Index of %s</title></head>\n<body><h4>Index of %s</h4>\n<pre>\n", file, file);
+	    printf("<html><head><title>Index of %s</title><style type='text/css'>a {text-decoration: none}</style></head>\n<body><h4>Index of %s</h4>\n<pre>\n", file, file);
 	    n = scandir(file, &dl, NULL, alphasort);
 	    if (n < 0)
 	        perror("scandir");

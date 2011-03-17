@@ -107,10 +107,8 @@ int main(int argc, char* argv[])
             }
             else
             {
-
                 close(p2c[0]);
                 close(c2p[1]);
-
                 write(p2c[1], pBuffer, sz_read);
                 while ((sz_read = read(c2p[0], pBuffer, BUFFER_SIZE)) > 0)
                     write(hSocket, pBuffer, sz_read);

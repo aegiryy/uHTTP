@@ -2,7 +2,7 @@
 #include <string.h>
 #include "resolver.h"
 
-static char * exts[] = {"php", "py"};
+static char * exts[] = {"php", "py", "sh"};
 
 static int in_exts(char * ext);
 
