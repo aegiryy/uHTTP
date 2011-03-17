@@ -16,7 +16,9 @@ char* prog_name[PROG_NUM]={"php-cgi","python","bash"};
 void do_cgi(const char* path,const char* suffix,const char* params){
 	FILE* fp;
 	char data[BUF_SIZE];
-	char cmd[BU1];
+	char cmd[BUF_SIZE];
+	int i=0;
+	int index=-1;
 	for(i=0;i<PROG_NUM;i++){
 		if(strcmp(prog_suff[i],suffix)==0){
 			index=i;	
