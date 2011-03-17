@@ -38,6 +38,3 @@ void do_cgi(const char* path,const char* suffix,const char* params){
 
     
 }
-
-
-

@@ -14,7 +14,7 @@
 #define BUFFER_SIZE 1024
 #define SOCKET_ERROR -1
 #define QUEUE_SIZE 5
-#define ROOT_DIR "./www"
+#define ROOT_DIR argv[2] 
 
 int main(int argc, char* argv[])
 {
@@ -24,9 +24,9 @@ int main(int argc, char* argv[])
     char pBuffer[BUFFER_SIZE];
     int nHostPort;
 
-    if(argc < 2)
+    if(argc < 3)
     {
-	    printf("\nUsage: server host-port\n");
+	    printf("Usage: server host-port root-dir\n");
 	    return 0;
     }
     else
