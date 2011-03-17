@@ -14,7 +14,7 @@
 #define BUFFER_SIZE 1024
 #define SOCKET_ERROR -1
 #define QUEUE_SIZE 5
-#define ROOT_DIR "."
+#define ROOT_DIR "./www"
 
 int main(int argc, char* argv[])
 {

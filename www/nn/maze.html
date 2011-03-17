@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!--
+You don't need to download or edit this file.
+-->	
+
+<head>
+		<title>Maze!</title>
+		<link href="maze.css" type="text/css" rel="stylesheet" />
+		
+		<script type="text/javascript">
+                   function change(){
+                     if (start==1) {
+                     setcolor("#ff8888");
+                      end=start;
+                      }
+                   
+                   }
+                function result() {
+                 if(start==1) {
+                 if (end==1) {
+                  
+                  alert("you lose");
+                  }
+                 else {
+                  alert("you win");
+                  }
+                  }
+                  start=0;
+		  end=0;
+                  document.getElementById("start").style.backgroundColor="#88ff88";
+                  setcolor("#eeeeee");
+                  }
+                  function setcolor(color) {
+			for (var i=1;i<6;i++) {
+                     document.getElementById("boundary"+i).style.backgroundColor=color;
+                       }
+                      
+                  }
+                </script>
+	</head>
+
+	<body>
+		<h1>The Amazing Mouse Maze!</h1>
+		<h2 id="status">Move your mouse over the "S" to begin.</h2>
+<script type="text/javascript">
+start=0;
+end=0;
+</script>
+		<!-- This part of the page represents the maze -->
+		<div id="maze">
+
+			<div id="start" onmouseover="start=1;this.style.backgroundColor='yellow';">S</div>
+			<div class="boundary" id="boundary1" onmouseover="change();"></div>
+			<div class="boundary" id="boundary2" onmouseover="change();"></div>
+			<div class="boundary" id="boundary3" onmouseover="change();"></div>
+			<div class="boundary" id="boundary4" onmouseover="change();"></div>
+			<div class="boundary" id="boundary5" onmouseover="change();"></div>
+			<div id="end" onmouseover="result()">E</div>
+		</div>
+		
+		<p>
+			The object of this game is to guide the mouse cursor through the start area and get to the end area.  Be sure to avoid the walls:
+		</p>
+		
+		<div class="boundary example"></div>
+		
+		<p>
+			Good luck!
+		</p>
+	</body>
+</html>
