@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/stat.h>
+#include "resolver.h"
+#include "cgi.h"
 
 #define SERVER_NAME "uHTTP"
 #define SERVER_URL "https://github.com/aegiryy/uHTTP"
@@ -23,8 +25,11 @@ static void strdecode(char* to, char* from);
 static int hexit(char c);
 static void strencode(char* to, size_t tosize, const char* from);
 
-
-int static_serve(char * rootdir)
+#ifdef XINETD
+int main(int argc, char * argv[])
+#else
+int serve(char * rootdir)
+#endif
 {
     char line[10000], method[8], path[1024], protocol[16], idx[20000], location[20000];
     char* file;
@@ -34,6 +39,15 @@ int static_serve(char * rootdir)
     FILE* fp;
     struct dirent **dl;
     int i, n;
+    int result;
+    char filepath[1024], ext[8], params[128];
+#ifdef XINETD
+    char * rootdir;
+    if (argc < 2)
+        send_error(500, "Internal Error", (char *)0, "Config error - need rootdir specified.");
+    rootdir = argv[1];
+#endif
+    params[0] = '\0';
 
     if (chdir(rootdir) < 0)
 	    send_error(500, "Internal Error", (char*) 0, "Config error - couldn't chdir().");
@@ -41,6 +55,14 @@ int static_serve(char * rootdir)
 	    send_error(400, "Bad Request", (char*) 0, "No request found.");
     if (sscanf(line, "%[^ ] %[^ ] %[^ ]", method, path, protocol) != 3) 
 	    send_error(400, "Bad Request", (char*) 0, "Can't parse request.");
+    if ((result = resolve(path, ext, params)) == 1)
+    {
+        filepath[0] = '\0';
+        strcat(filepath, rootdir);
+        strcat(filepath, path);
+        do_cgi(filepath, ext, params);
+        return 0;
+    }
     while (fgets(line, sizeof(line), stdin) != (char*) 0)
 	    if (strcmp(line, "\n") == 0 || strcmp(line, "\r\n") == 0)
 	        break;

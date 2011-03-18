@@ -2,16 +2,20 @@ CC=gcc
 SRC=source
 INC=include
 CFLAGS=-I$(INC) -Wall -c
-OBJS=server.o static.o resolver.o cgi.o
+OBJS=server.o controller.o resolver.o cgi.o
 TARGET=server
 
 all: $(OBJS)
 	$(CC) $(OBJS) -o $(TARGET)
 
+xinetd: $(SRC)/controller.c resolver.o cgi.o 
+	$(CC) $(CFLAGS) -DXINETD $<
+	$(CC) controller.o resolver.o cgi.o -o $(TARGET)
+
 server.o: $(SRC)/server.c
 	$(CC) $(CFLAGS) $<
 
-static.o: $(SRC)/static.c
+controller.o: $(SRC)/controller.c
 	$(CC) $(CFLAGS) $<
 
 resolver.o: $(SRC)/resolver.c

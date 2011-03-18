@@ -7,9 +7,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "static.h"
-#include "resolver.h"
-#include "cgi.h"
+#include "controller.h"
 
 #define BUFFER_SIZE 1024
 #define SOCKET_ERROR -1
@@ -65,13 +63,8 @@ int main(int argc, char* argv[])
 
     for(;;)
     {
-        char url[1024];
-        char path[1024];
-        char ext[8];
-        char params[1024];
         int sz_read;
         /* get the connected socket */
-        path[0] = '\0';
         hSocket=accept(hServerSocket,(struct sockaddr*)&Address,(socklen_t *)&nAddressSize);
         pBuffer[sz_read = read(hSocket,pBuffer,BUFFER_SIZE)] = EOF;
         // write(1, pBuffer, sz_read);
@@ -92,14 +85,7 @@ int main(int argc, char* argv[])
                 dup(p2c[0]);
                 close(1);
                 dup(c2p[1]);
-                if (resolve(pBuffer, url, ext, params) == 0)
-                    static_serve(ROOT_DIR);
-                else
-                {
-                    strcat(path, ROOT_DIR);
-                    strcat(path, url);
-                    do_cgi(path, ext, params);
-                }
+                serve(ROOT_DIR);
                 /* close pipe ends */
                 close(p2c[0]);
                 close(c2p[1]);

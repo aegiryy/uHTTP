@@ -1,1 +1,13 @@
-it's a project authored by Yuhang GE and me.
+HOWTO BUILD:
+    Actually, there are two versions of this project, one for xinetd and the other for itself. 
+    XINETD:
+        make xinetd
+    Individual:
+        make
+    You should config it so that it can run via xinetd. For the XINETD version, an extra arg 
+    of root directory should be provided. And when it comes to Individual Version, two extra
+    args -- port and root directory should be provided.
+
+
+AUTHOR:
+    It's a project authored by Yuhang GE and me. And it is released under the GPL v3 License.

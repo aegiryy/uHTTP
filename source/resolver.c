@@ -6,21 +6,16 @@ static char * exts[] = {"php", "py", "sh"};
 
 static int in_exts(char * ext);
 
-int resolve(char * req, char * url, char * ext, char * params)
+int resolve(char * url, char * ext, char * params)
 {
-    char method[8], protocol[16];
     char * dot;
     char * quesmark;
-    sscanf(req, "%[^ ] %[^ ] %[^ ]", method, url, protocol);
     dot = strrchr(url, '.');
     quesmark = strrchr(url, '?');
     if (dot == NULL)
         return 0;
     if (quesmark == NULL)
-    {
-        params = NULL;
         strcpy(ext, dot + 1);
-    }
     else
     {
         char * andmark;
